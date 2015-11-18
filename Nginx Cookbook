@@ -1,0 +1,18 @@
+
+1)	Cook book for nginx
+
+Assumptions – Installation on RHEL 6
+
+
+A)	Contents of nginx/recipes/default.rb
+
+# Installs nginx
+       package "nginx" do
+       action :install
+       end
+
+# Starts nginx
+       service 'nginx' do
+       action   :start
+       end
+
