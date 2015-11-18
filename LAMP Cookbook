@@ -1,0 +1,86 @@
+
+1)	Cookbook for LAMP and WordPress
+Assumptions – Can be installed in any Linux Envt because I used a case statement ( Redhat, suse)
+Bonus  
+•	Customized for  Any linux Install
+•	Customized a Template for the file wp-config.php ( WordPress customization)
+•	MySQL password is updated with chef  
+•	No External Dependent Cookbooks such as apache )
+
+A)	Contents of lamp_wordpress/recipes/default.rb
+
+# Common block of execution code for *nix flavors. Installs mysql, php and wordpress
+
+       package "mysql-server" do
+       action :install
+       end
+
+       service 'mysqld' do
+       action   :start
+       end
+
+       package "php" do
+       action :install
+       end
+
+       package "wordpress" do
+       action :install
+       end
+
+
+# Platform based execution for  httpd and apache2
+
+case node['platform']
+when 'redhat', 'centos', 'scientific', 'fedora', 'amazon', 'oracle'
+
+   
+       package "httpd" do
+       action :install
+       end
+
+       service 'httpd' do
+       action   :start
+       end
+
+
+when 'suse', 'opensuse'
+  
+       package "apache2" do
+       action :install
+       end
+
+       service 'apache2' do
+       action   :start
+       end
+
+end
+
+
+
+B)	Contents of lamp_wordpress/templates/default/wp-config.php.erb loaded by the below template in the above recipe
+The recipe receives the attributes from    lamp_wordpress/attributes/default.rb  file
+
+template "#{node['wordpress']['dir']}/wp-config.php" do
+  source 'wp-config.php.erb'
+  mode node['wordpress']['config_perms']
+  variables(
+    :db_name           => node['wordpress']['db']['name'],
+    :db_user           => node['wordpress']['db']['user'],
+    :db_password       => node['wordpress']['db']['pass'],
+    :db_host           => node['wordpress']['db']['host'],
+  )
+  owner node['wordpress']['install']['user']
+  group node['wordpress']['install']['group']
+  action :create
+end
+
+
+C)	Attributes setup in the attributes/default.rb
+node['wordpress']['db']['name'],
+node['wordpress']['db']['user'],
+node['wordpress']['db']['pass'],
+node['wordpress']['db']['host'],
+node['wordpress']['install']['user']
+node['wordpress']['install']['group']
+
+Enter file contents hereEnter file contents here
